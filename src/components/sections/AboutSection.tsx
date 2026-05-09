@@ -1,8 +1,8 @@
 const pillars = [
-  { title: 'Kualitas Terjamin', desc: 'Material premium dengan pengawasan ketat di setiap tahap pembangunan.' },
-  { title: 'Legalitas Lengkap', desc: 'SHM & IMB siap di hari serah terima — tanpa ribet, tanpa biaya tersembunyi.' },
-  { title: 'Lokasi Strategis', desc: 'Akses mudah ke pusat bisnis, sekolah unggulan, dan fasilitas umum.' },
-  { title: 'After Sales', desc: 'Tim purna jual siap membantu selama 5 tahun setelah pembelian.' },
+  { title: 'Konsultasi Gratis', desc: 'Analisis kebutuhan hunian dan simulasi KPR yang tepat tanpa biaya tambahan.' },
+  { title: 'Pilihan Terbaik', desc: 'Rekomendasi unit dari berbagai developer unggulan yang sudah terverifikasi legalitasnya.' },
+  { title: 'Pendampingan KPR', desc: 'Kami bantu proses pengajuan KPR ke berbagai Bank partner hingga disetujui (ACC).' },
+  { title: 'Transparansi Harga', desc: 'Harga resmi developer tanpa markup, serta informasi biaya pajak dan notaris yang jelas.' },
 ]
 
 export default function AboutSection() {
@@ -83,12 +83,11 @@ export default function AboutSection() {
           <span className="sec-label">Tentang Kami</span>
           <h2 style={{ fontSize: '2.5rem', marginTop: '0.25rem' }}>
             Membangun <em style={{ fontStyle: 'italic', color: 'var(--p2)' }}>Kepercayaan</em>
-            <br />Sejak 2009
+            <br />Anda
           </h2>
 
           <p style={{ fontSize: '0.9rem', color: 'var(--gray500)', lineHeight: 1.8, marginTop: '1.2rem' }}>
-            Prima Properti hadir sebagai mitra terpercaya dalam mewujudkan hunian impian masyarakat
-            Indonesia. Dengan pengalaman lebih dari 15 tahun dan ratusan unit yang telah
+            Rika Negari hadir sebagai mitra terpercaya dalam mewujudkan hunian impian anda. Dengan koleksi puluhan unit yang telah
             diserahterimakan, kami berkomitmen menghadirkan properti berkualitas dengan harga transparan.
           </p>
           <p style={{ fontSize: '0.9rem', color: 'var(--gray500)', lineHeight: 1.8, marginTop: '0.8rem' }}>

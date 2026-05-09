@@ -4,7 +4,7 @@ import { getProperties } from '@/data/properties'
 import type { Perumahan } from '@/data/properties'
 
 export default async function FeaturedProperties() {
-const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 })
+const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })
   return (
     <section className="section" style={{ background: 'var(--white)' }}>
       {/* Header */}

@@ -58,8 +58,9 @@ export async function getTipes(): Promise<any[]> {
  * Memanggil data perumahan beserta tipenya.
  * @param options.limitPerumahan - Jumlah maksimal perumahan yang diambil (default: null/semua)
  * @param options.limitTipe - Jumlah maksimal tipe rumah per perumahan (default: null/semua)
+ * @param options.lokasi - Filter berdasarkan lokasi perumahan
  */
-export async function getProperties(options?: { limitPerumahan?: number; limitTipe?: number }): Promise<Perumahan[]> {
+export async function getProperties(options?: { limitPerumahan?: number; limitTipe?: number ; lokasi?: string }): Promise<Perumahan[]> {
   const supabase = createClient()
 
   let query = supabase
@@ -72,6 +73,11 @@ export async function getProperties(options?: { limitPerumahan?: number; limitTi
       )
     `)
     .order('name')
+
+  // Filter berdasarkan lokasi jika ada parameter lokasi
+  if (options?.lokasi) {
+    query = query.eq('kota', options.lokasi)
+  }
 
   // Batasi jumlah perumahan jika ada parameter limitPerumahan
   if (options?.limitPerumahan) {

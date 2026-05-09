@@ -23,7 +23,7 @@ export default function Navbar() {
     }}>
       <Link href="/" style={{ textDecoration: 'none' }}>
         <span style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 600, color: 'var(--gray900)' }}>
-          Prima<span style={{ color: 'var(--p2)' }}>Properti</span>
+          Rika<span style={{ color: 'var(--p2)' }}>Negari</span>
         </span>
       </Link>
 

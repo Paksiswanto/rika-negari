@@ -1,4 +1,9 @@
 import Link from 'next/link'
+import { FiInstagram, FiPhoneCall, FiFacebook, FiMail } from "react-icons/fi";
+import { getProperties } from '@/data/properties';
+
+const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })
+
 
 export default function Footer() {
   return (
@@ -18,32 +23,36 @@ export default function Footer() {
             color: 'var(--white)',
             marginBottom: '0.8rem',
           }}>
-            Prima<span style={{ color: 'var(--p)' }}>Properti</span>
+            Rika<span style={{ color: 'var(--p)' }}>Negari</span>
           </div>
           <p style={{ fontSize: '0.85rem', color: '#64927a', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-            Mewujudkan hunian impian dengan kualitas premium dan standar terpercaya sejak 2009.
+            Mewujudkan hunian impian dengan kualitas premium dan standar terpercaya.
           </p>
           <div style={{ display: 'flex', gap: '0.6rem' }}>
-            {['in', 'ig', 'fb', 'yt'].map((s) => (
-              <div
-                key={s}
-                style={{
-                  width: 36,
-                  height: 36,
-                  background: 'rgba(255,255,255,0.06)',
-                  borderRadius: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  color: '#64927a',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                {s}
-              </div>
+            {[
+              { href: 'https://www.instagram.com/rikanegari/', icon: <FiInstagram size={30} /> },
+              { href: 'https://www.facebook.com/rikanegari', icon: <FiFacebook size={30} /> },
+              { href: 'mailto:info@rikanegari.co.id/', icon: <FiMail size={30} /> },
+              { href: 'https://wa.me/628128128128?text=Halo%20Rika%20Negari,%20saya%20ingin%20menanyakan%20informasi%20properti.', icon: <FiPhoneCall size={30} /> },
+            ].map((s) => (
+              <Link key={s.href} href={s.href} target="_blank" rel="noopener noreferrer">
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    background: 'rgba(255,255,255,0.06)',
+                    borderRadius: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64927a',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {s.icon}
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -54,10 +63,10 @@ export default function Footer() {
             Perumahan
           </div>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-            {['Grand Mutiara Residence', 'Puri Harmoni Surabaya', 'Bintang Timur Malang', 'Semua Perumahan'].map((item) => (
-              <li key={item}>
-                <Link href="/properti" style={{ fontSize: '0.83rem', color: '#64927a', textDecoration: 'none' }}>
-                  {item}
+            {properties.map((item) => (
+              <li key={item.id}>
+                <Link href={`/properti/${item.slug}`} style={{ fontSize: '0.83rem', color: '#64927a', textDecoration: 'none' }}>
+                  {item.name}
                 </Link>
               </li>
             ))}
@@ -86,16 +95,14 @@ export default function Footer() {
             Kontak
           </div>
           {[
-            { label: 'Kantor Pusat', value: 'Jl. Ahmad Yani No. 88\nSidoarjo, Jawa Timur' },
-            { label: 'Telepon', value: '+62 31 8888 9999' },
-            { label: 'Email', value: 'info@primaproperti.co.id' },
+            { label: 'Kantor Pusat', value: 'Sidoarjo, Jawa Timur' },
+            { label: 'Telepon', value: '081217813965' },
+            { label: 'Email', value: 'info@rikanegari.co.id' },
           ].map((c) => (
             <div key={c.label} style={{ fontSize: '0.83rem', color: '#64927a', marginBottom: '0.75rem', lineHeight: 1.6 }}>
               <strong style={{ color: 'var(--white)', fontWeight: 500 }}>{c.label}</strong>
               <br />
-              {c.value.split('\n').map((line, i) => (
-                <span key={i}>{line}{i < c.value.split('\n').length - 1 && <br />}</span>
-              ))}
+              {c.value}
             </div>
           ))}
         </div>
@@ -112,7 +119,7 @@ export default function Footer() {
         gap: '1rem',
       }}>
         <div style={{ fontSize: '0.75rem', color: '#2a5c3e' }}>
-          © 2025 Prima Properti. Seluruh hak cipta dilindungi.
+          © 2026 Rika Negari. Seluruh hak cipta dilindungi.
         </div>
         <div style={{ display: 'flex', gap: '2rem' }}>
           {['Kebijakan Privasi', 'Syarat & Ketentuan'].map((item) => (

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 
-const WA_NUMBER = '6231888899999'
-const WA_MESSAGE = 'Halo Prima Properti, saya ingin menanyakan informasi properti.'
+const WA_NUMBER = '081217813965'
+const WA_MESSAGE = 'Halo Rika Negari, saya ingin menanyakan informasi properti.'
 
 export default function WAButton() {
   const [hovered, setHovered] = useState(false)

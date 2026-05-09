@@ -48,7 +48,7 @@ export default function HeroSection() {
         {/* Subtitle */}
         <p style={{ fontSize: '1rem', color: 'var(--gray500)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: '40ch' }}>
           Hunian premium dengan desain modern, lokasi strategis, dan harga yang transparan.
-          Wujudkan rumah idaman bersama Prima Properti.
+          Wujudkan rumah idaman bersama Rika Negari.
         </p>
 
         {/* CTAs */}
