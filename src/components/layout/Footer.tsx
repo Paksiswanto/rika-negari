@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { FiInstagram, FiPhoneCall, FiFacebook, FiMail } from "react-icons/fi";
 import { getProperties } from '@/data/properties';
 
-const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })
 
 
-export default function Footer() {
+export default async function Footer() {
+  const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })
+
   return (
     <footer style={{ background: 'var(--gray900)', padding: '5rem 3rem 2rem' }}>
       <div style={{
