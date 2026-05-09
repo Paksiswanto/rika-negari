@@ -1,12 +1,8 @@
 import Link from 'next/link'
 import { FiInstagram, FiPhoneCall, FiFacebook, FiMail } from "react-icons/fi";
-import { getProperties } from '@/data/properties';
+import { Perumahan } from '@/data/properties';
 
-
-
-export default async function Footer() {
-  const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })
-
+export default function Footer() {
   return (
     <footer style={{ background: 'var(--gray900)', padding: '5rem 3rem 2rem' }}>
       <div style={{
@@ -64,10 +60,10 @@ export default async function Footer() {
             Perumahan
           </div>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-            {properties.map((item) => (
-              <li key={item.id}>
-                <Link href={`/properti/${item.slug}`} style={{ fontSize: '0.83rem', color: '#64927a', textDecoration: 'none' }}>
-                  {item.name}
+            {['Grand Sentosa Land', 'Green Mansion Juanda', 'The Oso', 'Semua Perumahan'].map((item) => (
+              <li key={item}>
+                <Link href="/properti" style={{ fontSize: '0.83rem', color: '#64927a', textDecoration: 'none' }}>
+                  {item}
                 </Link>
               </li>
             ))}

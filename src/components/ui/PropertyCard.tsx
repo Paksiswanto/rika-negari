@@ -45,18 +45,16 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
   const [saved, setSaved] = useState(false)
   const [saveHover, setSaveHover] = useState(false)
 
-  // Defensive Check: Jika data perumahan kosong, jangan render link agar tidak error
   if (!perumahan) return null;
 
   const ci         = ciClass[colorIndex % 3]
   const houseColor = houseColors[colorIndex % 3]
   
-  // URL SEKARANG AMAN karena menggunakan data yang dikirim langsung
   const detailHref = `/properti/${perumahan.slug}/${tipe.slug}`
-
+console.log('isi tipe:', tipe);
   const firstPhoto = tipe.galeri
     ?.sort((a, b) => a.urutan - b.urutan)?.[0]?.url ?? ''
-
+  console.log('First photo for', tipe.name, ':', tipe.galeri, '=>', firstPhoto)
   return (
     <div className="prop-card">
       {/* Image Section */}

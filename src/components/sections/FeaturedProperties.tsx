@@ -2,6 +2,7 @@ import Link from 'next/link'
 import PropertyCard from '@/components/ui/PropertyCard'
 import { getProperties } from '@/data/properties'
 import type { Perumahan } from '@/data/properties'
+import { GetTipes } from '@/lib/api'
 
 export default async function FeaturedProperties() {
 const properties = await getProperties({ limitPerumahan: 5, limitTipe: 3 , lokasi: 'Sidoarjo' })

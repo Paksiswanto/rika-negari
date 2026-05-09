@@ -13,7 +13,6 @@ export default function PropertiPage() {
   const [allTipes, setAllTipes] = useState<any[]>([])
   const [perumahanList, setPerumahanList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-console.log(getProperties);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,7 +64,7 @@ console.log(getProperties);
   }
 
   return (
-    <>
+    <div>
       <Navbar />
       <main style={{ background: 'var(--gray50)', minHeight: '80vh', padding: '3rem 3rem 5rem' }}>
         {/* Header */}
@@ -193,7 +192,6 @@ console.log(getProperties);
             gap: '1.5rem',
           }}>
             {filtered.map((item, i) => (
-              console.log(item.perumahan),
               <PropertyCard
                 key={`${item.perumahan_id}-${item.id}`}
                 tipe={item}
@@ -206,6 +204,6 @@ console.log(getProperties);
       </main>
       <Footer />
       <WAButton />
-    </>
+    </div>
   )
 }
