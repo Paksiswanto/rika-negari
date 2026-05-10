@@ -5,7 +5,6 @@ import Footer from '@/components/layout/Footer'
 import WAButton from '@/components/ui/WAButton'
 import ImageSlider from '@/components/ui/ImageSlider'
 import ContactForm from '@/components/ui/ContactForm'
-import GalleryDetail from '@/components/ui/GalleryDetail'
 
 interface Props {
   params: { slug: string; tipeId: string }
@@ -40,75 +39,85 @@ export default async function DetailPage({ params }: Props) {
     <>
       <Navbar />
       <main style={{ backgroundColor: 'white' }}>
-       <div style={{ padding: '1rem 3rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--gray500)', borderBottom: '1px solid var(--gray200)', flexWrap: 'wrap' }}>
-
+        {/* Breadcrumb */}
+        <div style={{ padding: '1rem 1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--gray500)', borderBottom: '1px solid var(--gray200)', flexWrap: 'wrap' }}>
           <a href="/" style={{ color: 'var(--gray500)', textDecoration: 'none' }}>Beranda</a>
-
           <span>›</span>
-
           <a href="/properti" style={{ color: 'var(--gray500)', textDecoration: 'none' }}>Properti</a>
-
           <span>›</span>
-
           <span style={{ color: 'var(--p3)', fontWeight: 600 }}>{tipe.name}</span>
-
         </div>
 
-        {/* Layout Grid Baru */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 400px', // Kiri lebar, kanan fixed
-          gap: '2rem', 
-          padding: '2rem 3rem',
-          maxWidth: '1400px',
+        {/* Container Utama - Diubah jadi Single Column */}
+        <div style={{
+          maxWidth: '900px', // Dibuat lebih ramping agar enak dibaca satu kolom
           margin: '0 auto',
-          alignItems: 'start' // WAJIB agar sticky jalan
+          padding: '2rem 1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2.5rem'
         }}>
-          
-          {/* KOLOM KIRI: Galeri memanjang ke bawah */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-             <GalleryDetail images={galeri} />
-             
-             {/* Deskripsi pindah ke bawah galeri agar tidak kosong saat scroll */}
-             <div style={{ padding: '1rem 0' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>Tentang {perumahan.name}</h2>
-                <p style={{ fontSize: '0.95rem', color: 'var(--gray600)', lineHeight: 1.8, marginBottom: '1.5rem' }}>{perumahan.deskripsi}</p>
-                {tipe.deskripsi && (
-                   <p style={{ fontSize: '0.95rem', color: 'var(--gray600)', lineHeight: 1.8 }}>{tipe.deskripsi}</p>
-                )}
-             </div>
+
+          {/* 1. Header Info (Nama & Harga) */}
+          <div style={{ textAlign: 'left' }}>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', fontFamily: 'Fraunces, serif' }}>{tipe.name}</h1>
+            <p style={{ fontSize: '1rem', color: 'var(--gray500)', marginBottom: '1.5rem' }}>📍 {perumahan.lokasi}</p>
+            
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', fontWeight: 600, color: 'var(--p2)' }}>{tipe.harga}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--gray500)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Harga Mulai</div>
+            </div>
           </div>
 
-          {/* KOLOM KANAN: Card Sticky */}
+          {/* 2. Galeri */}
+          <ImageSlider slides={galeri} />
+
+          {/* 3. Spesifikasi Ringkas */}
           <div style={{ 
-            position: 'sticky', 
-            top: '100px', // Jarak dari atas saat scroll
-            padding: '2rem',
-            borderRadius: 24,
-            border: '1.5px solid var(--gray200)',
-            backgroundColor: 'white',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+            gap: '1rem',
+            padding: '1.5rem',
+            background: 'var(--gray50)',
+            borderRadius: '20px',
+            border: '1px solid var(--gray200)'
           }}>
-            <h1 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{tipe.name}</h1>
-            <p style={{ fontSize: '0.8rem', color: 'var(--gray500)', marginBottom: '1.5rem' }}>📍 {perumahan.lokasi}</p>
+            {specs.map((s) => (
+              <div key={s.key} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--gray900)' }}>{s.val}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--gray500)', textTransform: 'uppercase', marginTop: '4px' }}>{s.key}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* 4. Deskripsi Detail */}
+          <div style={{ lineHeight: 1.8 }}>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Tentang {perumahan.name}</h2>
+            <p style={{ fontSize: '1rem', color: 'var(--gray600)', marginBottom: '2rem' }}>{perumahan.deskripsi}</p>
             
-            <div style={{ marginBottom: '1.5rem' }}>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 600, color: 'var(--p2)' }}>{tipe.harga}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--gray500)', fontWeight: 700, textTransform: 'uppercase' }}>Harga Mulai</div>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Detail Tipe {tipe.name}</h2>
+            {tipe.deskripsi && (
+              <div 
+                className="rich-content"
+                dangerouslySetInnerHTML={{ __html: tipe.deskripsi }}
+                style={{ fontSize: '1rem', color: 'var(--gray600)' }}
+              />
+            )}
+          </div>
+
+          {/* 5. Bagian Kontak (Pengganti Sticky Card) */}
+          <div style={{
+            padding: '2.5rem',
+            borderRadius: 24,
+            border: '2px solid var(--plight)',
+            backgroundColor: 'var(--white)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.03)',
+            marginTop: '2rem'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.6rem', marginBottom: '0.5rem' }}>Tertarik dengan unit ini?</h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--gray500)' }}>Isi formulir di bawah, tim marketing kami akan segera menghubungi Anda.</p>
             </div>
-
-            <div className="divider" style={{ margin: '1.5rem 0', height: '1px', background: 'var(--gray200)' }} />
-
-            {/* Specs Mini */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '2rem' }}>
-              {specs.map((s) => (
-                <div key={s.key} style={{ background: 'var(--gray50)', borderRadius: 12, padding: '0.8rem', border: '1px solid var(--gray100)' }}>
-                  <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--p3)' }}>{s.val}</div>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--gray500)', textTransform: 'uppercase' }}>{s.key}</div>
-                </div>
-              ))}
-            </div>
-
             <ContactForm tipeNama={tipe.name} />
           </div>
 

@@ -7,21 +7,25 @@ const pillars = [
 
 export default function AboutSection() {
   return (
-    <section id="tentang" className="section" style={{ background: 'var(--plight)' }}>
-      <div style={{
+    <section id="tentang" className="section" style={{ background: 'var(--plight)', overflow: 'hidden' }}>
+      {/* Container Utama - Kita gunakan class grid-responsive dari globals.css yang kita buat tadi */}
+      <div className="grid-responsive" style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '5rem',
+        gap: '4rem',
         alignItems: 'center',
+        maxWidth: '1200px',
+        margin: '0 auto',
       }}>
-        {/* Visual */}
-        <div style={{ position: 'relative', height: 420 }}>
+
+        {/* Visual Section */}
+        <div style={{ position: 'relative', height: '420px' }}>
           {/* Main card */}
           <div style={{
             position: 'absolute', right: 0, top: 0,
             width: '78%', height: '82%',
             background: '#c8fce0',
-            borderRadius: 24,
+            borderRadius: '24px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg viewBox="0 0 300 260" fill="none" width="60%" aria-hidden>
@@ -38,7 +42,7 @@ export default function AboutSection() {
             position: 'absolute', left: 0, bottom: 0,
             width: '46%', height: '52%',
             background: 'var(--slight)',
-            borderRadius: 20,
+            borderRadius: '20px',
             border: '2px solid #9dfce8',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
@@ -54,67 +58,48 @@ export default function AboutSection() {
             position: 'absolute', top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
             background: 'var(--white)',
-            borderRadius: 20,
-            padding: '1.5rem 2rem',
+            borderRadius: '20px',
+            padding: '1.2rem 1.8rem',
             textAlign: 'center',
             zIndex: 10,
             border: '2px solid #b6f5d4',
             boxShadow: '0 4px 20px rgba(29,226,100,0.15)',
           }}>
-            <div style={{
-              fontFamily: 'Fraunces, serif',
-              fontSize: '3rem', fontWeight: 600,
-              color: 'var(--p2)', lineHeight: 1,
-            }}>
-              15
-            </div>
-            <div style={{
-              fontSize: '0.7rem', fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.1em',
-              color: 'var(--gray500)', marginTop: '0.3rem',
-            }}>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', fontWeight: 600, color: 'var(--p2)', lineHeight: 1 }}>15</div>
+            <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--gray500)', marginTop: '0.3rem', whiteSpace: 'nowrap' }}>
               Tahun Pengalaman
             </div>
           </div>
         </div>
 
-        {/* Text */}
+        {/* Text Section */}
         <div>
           <span className="sec-label">Tentang Kami</span>
-          <h2 style={{ fontSize: '2.5rem', marginTop: '0.25rem' }}>
-            Membangun <em style={{ fontStyle: 'italic', color: 'var(--p2)' }}>Kepercayaan</em>
-            <br />Anda
+          <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', lineHeight: 1.2 }}>
+            Membangun <em style={{ fontStyle: 'italic', color: 'var(--p2)' }}>Kepercayaan</em> Anda
           </h2>
 
           <p style={{ fontSize: '0.9rem', color: 'var(--gray500)', lineHeight: 1.8, marginTop: '1.2rem' }}>
-            Rika Negari hadir sebagai mitra terpercaya dalam mewujudkan hunian impian anda. Dengan koleksi puluhan unit yang telah
-            diserahterimakan, kami berkomitmen menghadirkan properti berkualitas dengan harga transparan.
-          </p>
-          <p style={{ fontSize: '0.9rem', color: 'var(--gray500)', lineHeight: 1.8, marginTop: '0.8rem' }}>
-            Setiap unit melewati standar kualitas ketat dan didukung garansi struktur penuh untuk
-            ketenangan pikiran Anda.
+            Rika Negari hadir sebagai mitra terpercaya dalam mewujudkan hunian impian anda di Sidoarjo & Surabaya.
+            Kami berkomitmen menghadirkan properti berkualitas dengan harga transparan.
           </p>
 
-          {/* Pillars */}
-          <div style={{
+          {/* Pillars Grid - Menggunakan class grid-responsive untuk HP */}
+          <div className="grid-responsive" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '1rem',
-            marginTop: '1.5rem',
+            marginTop: '2rem',
           }}>
             {pillars.map((p) => (
               <div key={p.title} style={{
                 background: 'var(--white)',
-                borderRadius: 14,
-                padding: '1rem 1.1rem',
+                borderRadius: '14px',
+                padding: '1.2rem',
                 border: '1.5px solid #b6f5d4',
               }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gray900)', marginBottom: '0.3rem' }}>
-                  {p.title}
-                </div>
-                <div style={{ fontSize: '0.77rem', color: 'var(--gray500)', lineHeight: 1.6 }}>
-                  {p.desc}
-                </div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gray900)', marginBottom: '0.4rem' }}>{p.title}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--gray500)', lineHeight: 1.6 }}>{p.desc}</div>
               </div>
             ))}
           </div>

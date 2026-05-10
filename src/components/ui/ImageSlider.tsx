@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
+
 interface SlideItem {
-  url   : string
-  label : string
+  url: string
+  label: string
   urutan: number
+  name: string
 }
+
 
 interface Props {
   slides: SlideItem[]
@@ -27,10 +30,8 @@ const bgColors = ['var(--plight)', 'var(--slight)', 'var(--tlight)', '#edfff5', 
 
 export default function ImageSlider({ slides }: Props) {
   const [current, setCurrent] = useState(0)
-
   const prev = () => setCurrent((c) => Math.max(0, c - 1))
   const next = () => setCurrent((c) => Math.min(slides.length - 1, c + 1))
-
   return (
     <div>
       {/* Main slider */}
@@ -59,7 +60,6 @@ export default function ImageSlider({ slides }: Props) {
               ) : (
                 <div style={{ opacity: 0.3, textAlign: 'center' }}>
                   <div style={{ fontSize: '3rem' }}>🏠</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--gray500)' }}>{slide.label}</div>
                 </div>
               )}
             </div>
@@ -113,7 +113,6 @@ export default function ImageSlider({ slides }: Props) {
               color: i === current ? 'var(--p2)' : 'var(--gray500)',
               textTransform: 'uppercase', letterSpacing: '0.04em',
             }}>
-              {slide.label}
             </div>
             {i === current && (
               <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'var(--p)', borderRadius: '3px 3px 0 0' }} />

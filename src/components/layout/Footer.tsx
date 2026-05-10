@@ -1,3 +1,5 @@
+"use client"
+
 import Link from 'next/link'
 import { FiInstagram, FiPhoneCall, FiFacebook, FiMail } from "react-icons/fi";
 import { Perumahan } from '@/data/properties';

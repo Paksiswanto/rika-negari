@@ -17,7 +17,6 @@ export default function HomePage() {
         <AnnouncementStrip />
         <FeaturedProperties />
         <AboutSection />
-        <GallerySection />
         <TestimonialsSection />
       </main>
       <Footer />
