@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Prima Properti — Hunian Premium Jawa Timur',
+  title: 'Rika-Negari - Menempatkan Rumah Impian Anda',
   description:
-    'Temukan rumah impian Anda bersama Prima Properti. Perumahan premium dengan lokasi strategis, legalitas lengkap, dan harga transparan di Sidoarjo & Surabaya.',
+    'Temukan rumah impian Anda bersama Rika-Negari. Perumahan premium dengan lokasi strategis, legalitas lengkap, dan harga transparan di Sidoarjo & Surabaya.',
   keywords: 'properti, perumahan, rumah, Sidoarjo, Surabaya, KPR, hunian premium',
   openGraph: {
-    title: 'Prima Properti — Hunian Premium Jawa Timur',
+    title: 'Rika-Negari — Hunian Premium Jawa Timur',
     description: 'Perumahan premium dengan lokasi strategis dan harga transparan.',
     type: 'website',
   },
