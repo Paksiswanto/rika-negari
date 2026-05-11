@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/utils/connect'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -10,83 +10,147 @@ import Placeholder from '@tiptap/extension-placeholder'
 
 const supabase = createClient()
 
-// ── TipTap Editor Component (Fixed Duplicate & Styled) ──────────────────
+// ── Types ─────────────────────────────────────────────────────
+interface Perumahan {
+  id: string; name: string; slug: string; lokasi: string; kota?: string; deskripsi?: string
+}
+
+interface TipeRumah {
+  id: string; perumahan_id: string; slug: string; name: string; lb: number; lt: number;
+  kt: string; km: number; harga: string; harga_num: number;
+  badge: string; highlight: boolean; deskripsi: string; perumahan?: { name: string }; galeri?: any[]
+}
+
+// ── Constants ─────────────────────────────────────────────────
+const BADGE_OPTIONS = ['Ready Stock', 'Inden', 'Best Seller', 'Premium']
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
+
+const EMPTY_FORM = {
+  perumahan_id: '', name: '', slug: '', deskripsi: '',
+  badge: 'Ready Stock', lb: '', lt: '', kt: '', km: '',
+  harga: '', harga_num: '', highlight: false,
+}
+
+const EMPTY_PER_FORM = { id: '', name: '', slug: '', lokasi: '', kota: '', deskripsi: '' }
+
+// ── Helpers ───────────────────────────────────────────────────
+function toSlug(str: string) {
+  return str.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
+}
+
+async function uploadToCloudinary(file: File, folder: string): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('upload_preset', UPLOAD_PRESET)
+  fd.append('folder', `prima-properti/${folder}`)
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd })
+  if (!res.ok) throw new Error('Upload Cloudinary gagal')
+  const data = await res.json()
+  return data.public_id
+}
+function ToolbarBtn({ active, onClick, title, children }: { active?: boolean; onClick: () => void; title: string; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      style={{
+        padding: '4px 8px', border: 'none', borderRadius: 6, cursor: 'pointer',
+        fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '0.8rem', fontWeight: 600,
+        background: active ? 'var(--p)' : 'transparent',
+        color: active ? 'var(--gray900)' : 'var(--gray700)',
+        transition: 'all 0.15s',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
+// ── TipTap Editor Component ───────────────────────────────────
 function RichEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      Placeholder.configure({ placeholder: placeholder ?? 'Tulis deskripsi...' }),
-    ],
-    content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    immediatelyRender: false,
+  immediatelyRender: false,   
+  extensions: [
+    StarterKit,
+    Underline,
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    Placeholder.configure({ placeholder: placeholder ?? 'Tulis deskripsi...' }),
+  ],
+  content: value,
+  onUpdate: ({ editor }) => onChange(editor.getHTML()),
   })
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      const timer = setTimeout(() => {
-        editor.commands.setContent(value);
-      }, 10);
-      return () => clearTimeout(timer);
+    if (!editor) return
+    const current = editor.getHTML()
+    // Kalau value bukan HTML, wrap jadi <p>
+    const normalized = value?.startsWith('<') ? value : <p>${value ?? ''}</p>
+    if (normalized !== current) {
+      editor.commands.setContent(normalized)
     }
   }, [value, editor])
-
-  if (!editor) return <div style={{ padding: '1rem', color: '#ccc' }}>Memuat Editor...</div>
+  if (!editor) return null
 
   return (
-    <div className="tiptap-wrapper" style={{ border: '1.5px solid var(--gray200)', borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', gap: 5, padding: '8px', background: 'var(--gray50)', borderBottom: '1px solid var(--gray200)', flexWrap: 'wrap' }}>
-        <button type="button" onClick={() => editor.chain().focus().toggleBold().run()}
-          style={{ ...btnTool, background: editor.isActive('bold') ? 'var(--p)' : 'white' }}>B</button>
-        <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()}
-          style={{ ...btnTool, background: editor.isActive('italic') ? 'var(--p)' : 'white' }}>I</button>
-        <button type="button" onClick={() => editor.chain().focus().toggleUnderline().run()}
-          style={{ ...btnTool, background: editor.isActive('underline') ? 'var(--p)' : 'white' }}>U</button>
-        <div style={{ width: 1, background: '#ddd', margin: '0 5px' }} />
-        <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()}
-          style={{ ...btnTool, background: editor.isActive('bulletList') ? 'var(--p)' : 'white' }}>• List</button>
-        <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          style={{ ...btnTool, background: editor.isActive('orderedList') ? 'var(--p)' : 'white' }}>1. List</button>
+    <div style={{ border: '1.5px solid var(--gray200)', borderRadius: 10, overflow: 'hidden' }}>
+      {/* Toolbar */}
+      <div style={{
+        display: 'flex', gap: 2, flexWrap: 'wrap', padding: '6px 8px',
+        borderBottom: '1px solid var(--gray200)', background: 'var(--gray50)',
+      }}>
+        <ToolbarBtn active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold">B</ToolbarBtn>
+        <ToolbarBtn active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic"><em>I</em></ToolbarBtn>
+        <ToolbarBtn active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></ToolbarBtn>
+        <ToolbarBtn active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()} title="Strike"><s>S</s></ToolbarBtn>
+        <div style={{ width: 1, background: 'var(--gray200)', margin: '0 4px' }} />
+        <ToolbarBtn active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="Heading 2">H2</ToolbarBtn>
+        <ToolbarBtn active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title="Heading 3">H3</ToolbarBtn>
+        <div style={{ width: 1, background: 'var(--gray200)', margin: '0 4px' }} />
+        <ToolbarBtn active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet List">• List</ToolbarBtn>
+        <ToolbarBtn active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Ordered List">1. List</ToolbarBtn>
+        <div style={{ width: 1, background: 'var(--gray200)', margin: '0 4px' }} />
+        <ToolbarBtn active={editor.isActive({ textAlign: 'left' })} onClick={() => editor.chain().focus().setTextAlign('left').run()} title="Align Left">≡L</ToolbarBtn>
+        <ToolbarBtn active={editor.isActive({ textAlign: 'center' })} onClick={() => editor.chain().focus().setTextAlign('center').run()} title="Align Center">≡C</ToolbarBtn>
+        <ToolbarBtn active={editor.isActive({ textAlign: 'right' })} onClick={() => editor.chain().focus().setTextAlign('right').run()} title="Align Right">≡R</ToolbarBtn>
+        <div style={{ width: 1, background: 'var(--gray200)', margin: '0 4px' }} />
+        <ToolbarBtn active={false} onClick={() => editor.chain().focus().undo().run()} title="Undo">↩️</ToolbarBtn>
+        <ToolbarBtn active={false} onClick={() => editor.chain().focus().redo().run()} title="Redo">↪️</ToolbarBtn>
       </div>
-
-      <div className="tiptap-content" style={{ padding: '1rem', minHeight: '180px', cursor: 'text', background: 'white' }}>
+      {/* Editor area */}
+      <div style={{ padding: '0.75rem 1rem', minHeight: 120, background: 'var(--white)', fontSize: '0.88rem', lineHeight: 1.8, color: 'var(--gray900)' }}>
         <EditorContent editor={editor} />
       </div>
-
       <style>{`
-        .tiptap-content .tiptap:focus { outline: none; }
-        .tiptap-content ul { padding-left: 1.5rem; margin: 0.5rem 0; list-style-type: disc !important; }
-        .tiptap-content ol { padding-left: 1.5rem; margin: 0.5rem 0; list-style-type: decimal !important; }
-        .tiptap-content p { margin-bottom: 0.5rem; line-height: 1.6; }
         .tiptap p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
-          float: left; color: #adb5bd; pointer-events: none; height: 0;
+          float: left; color: var(--gray300); pointer-events: none; height: 0;
         }
+        .tiptap:focus { outline: none; }
+        .tiptap ul { padding-left: 1.4rem; }
+        .tiptap ol { padding-left: 1.4rem; }
+        .tiptap h2 { font-size: 1.2rem; font-weight: 700; margin: 0.5rem 0; }
+        .tiptap h3 { font-size: 1rem; font-weight: 700; margin: 0.4rem 0; }
       `}</style>
     </div>
   )
 }
 
-// ── Main Admin Component ────────────────────────────────────────────
+// ── Main Admin Component ──────────────────────────────────────
 export default function AdminPage() {
   const [tab, setTab] = useState<'list' | 'form' | 'perumahan'>('list')
   const [perumahanList, setPerumahanList] = useState<any[]>([])
   const [tipeList, setTipeList] = useState<any[]>([])
-
-  // State Tipe Rumah
-  const [form, setForm] = useState<any>({ perumahan_id: '', name: '', slug: '', deskripsi: '', harga: '', harga_num: '', lb: '', lt: '', kt: '', km: '', badge: 'Ready Stock', highlight: false })
+  const [form, setForm] = useState<any>(EMPTY_FORM)
   const [editId, setEditId] = useState<string | null>(null)
-
-  // State Perumahan
-  const [perForm, setPerForm] = useState<any>({ name: '', lokasi: '', slug: '', deskripsi: '', kota: '' })
-  const [perEditId, setPerEditId] = useState<string | null>(null)
-
+  const [previews, setPreviews] = useState<{ file: File; url: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  const [perForm, setPerForm] = useState<any>(EMPTY_PER_FORM)
+  const [perEditId, setPerEditId] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchPerumahan(); fetchTipes() }, [])
 
@@ -94,88 +158,74 @@ export default function AdminPage() {
     const { data } = await supabase.from('perumahan').select('*').order('name')
     if (data) setPerumahanList(data)
   }
-
   async function fetchTipes() {
     const { data } = await supabase.from('tipe_rumah').select('*, perumahan(name)').order('name')
     if (data) setTipeList(data)
   }
 
+  const set = (key: string, val: any) => setForm((prev: any) => ({ ...prev, [key]: val }))
+  const resetForm = () => { setForm(EMPTY_FORM); setEditId(null); setPreviews([]) }
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000) }
 
-  // Handlers
-  function openEdit(tipe: any) {
-    setEditId(tipe.id)
-    setForm({
-      perumahan_id: tipe.perumahan_id,
-      name: tipe.name,
-      slug: tipe.slug,
-      deskripsi: tipe.deskripsi || '',
-      harga: tipe.harga,
-      harga_num: String(tipe.harga_num),
-      lb: String(tipe.lb),
-      lt: String(tipe.lt),
-      kt: tipe.kt,
-      km: String(tipe.km),
-      badge: tipe.badge,
-      highlight: tipe.highlight
-    })
-    setTab('form')
+  function handleFiles(files: FileList | null) {
+    if (!files) return
+    setPreviews(prev => [...prev, ...Array.from(files).map(file => ({ file, url: URL.createObjectURL(file) }))])
   }
+  function removePreview(i: number) { setPreviews(prev => prev.filter((_, idx) => idx !== i)) }
 
-  function openPerEdit(p: any) {
-    setPerEditId(p.id)
-    setPerForm({ name: p.name, lokasi: p.lokasi, deskripsi: p.deskripsi, kota: p.kota, slug: p.slug || '' })
-  }
-
-  async function handleTipeSubmit() {
+  async function handleSubmit() {
     setLoading(true)
-    const payload = { ...form, lb: Number(form.lb), lt: Number(form.lt), km: Number(form.km), harga_num: Number(form.harga_num) }
-    const { error } = editId
-      ? await supabase.from('tipe_rumah').update(payload).eq('id', editId)
-      : await supabase.from('tipe_rumah').insert(payload)
+    try {
+      const payload = { ...form, lb: Number(form.lb), lt: Number(form.lt), km: Number(form.km), harga_num: Number(form.harga_num) }
+      let id = editId
+      if (editId) {
+        await supabase.from('tipe_rumah').update(payload).eq('id', editId)
+      }else {
+      const { data, error } = await supabase.from('tipe_rumah').insert(payload).select('id').single()
 
-    if (!error) {
-      showToast('Data berhasil disimpan');
-      setTab('list');
-      fetchTipes();
-      setEditId(null);
-      setForm({ perumahan_id: '', name: '', slug: '', deskripsi: '', harga: '', harga_num: '', lb: '', lt: '', kt: '', km: '', badge: 'Ready Stock', highlight: false });
+      if (error) throw error
+      if (!data) throw new Error('Gagal mendapatkan ID tipe rumah baru')
+
+      id = data.id
     }
-    setLoading(false)
+
+      
+      if (previews.length > 0) {
+        for (const p of previews) {
+          const url = await uploadToCloudinary(p.file, form.slug)
+          await supabase.from('galeri').insert({ tipe_id: id, perumahan_id: form.perumahan_id, url, label: p.file.name })
+        }
+      }
+      showToast('Berhasil disimpan!'); setTab('list'); fetchTipes(); resetForm()
+    } catch (e: any) { showToast(e.message) } finally { setLoading(false) }
   }
 
   async function handlePerSubmit() {
-    setLoading(true)
+    const payload = { ...perForm, slug: perForm.slug || toSlug(perForm.name) }
     const { error } = perEditId && perEditId !== 'NEW'
-      ? await supabase.from('perumahan').update(perForm).eq('id', perEditId)
-      : await supabase.from('perumahan').insert(perForm)
-
+      ? await supabase.from('perumahan').update(payload).eq('id', perEditId)
+      : await supabase.from('perumahan').insert(payload)
     if (!error) { showToast('Perumahan disimpan'); setPerEditId(null); fetchPerumahan() }
-    setLoading(false)
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1.5rem' }}>Dashboard Rika Negari</h1>
-
-      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #eee', marginBottom: '2rem' }}>
-        {['list', 'form', 'perumahan'].map(t => (
-          <button key={t} onClick={() => setTab(t as any)} style={{ ...tabBtn, borderBottom: tab === t ? '3px solid var(--p)' : 'none' }}>
-            {t === 'list' ? 'Daftar' : t === 'form' ? '+ Tipe Rumah' : 'Perumahan'}
-          </button>
-        ))}
+    <div style={{ maxWidth: 1400, margin: '2rem auto', padding: '0 1.5rem', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid var(--gray200)', marginBottom: '2rem' }}>
+        <button onClick={() => setTab('list')} style={{ ...tabBtnSx, borderBottom: tab === 'list' ? '2px solid var(--p)' : 'none' }}>Daftar</button>
+        <button onClick={() => { setTab('form'); resetForm() }} style={{ ...tabBtnSx, borderBottom: tab === 'form' ? '2px solid var(--p)' : 'none' }}>+ Tambah Tipe</button>
+        <button onClick={() => setTab('perumahan')} style={{ ...tabBtnSx, borderBottom: tab === 'perumahan' ? '2px solid var(--p)' : 'none' }}>Perumahan</button>
       </div>
 
       {tab === 'list' && (
         <div style={cardSx}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr style={{ textAlign: 'left', background: '#f9f9f9' }}><th style={thSx}>Tipe Unit</th><th style={thSx}>Perumahan</th><th style={thSx}>Aksi</th></tr></thead>
+            <thead><tr style={{ textAlign: 'left', background: 'var(--gray50)' }}><th style={thSx}>Tipe</th><th style={thSx}>Perumahan</th><th style={thSx}>Aksi</th></tr></thead>
             <tbody>
               {tipeList.map(t => (
-                <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
+                <tr key={t.id} style={{ borderBottom: '1px solid var(--gray200)' }}>
                   <td style={tdSx}>{t.name}</td>
                   <td style={tdSx}>{t.perumahan?.name}</td>
-                  <td style={tdSx}><button onClick={() => openEdit(t)} style={btnSmall}>Edit</button></td>
+                  <td style={tdSx}><button onClick={() => { setEditId(t.id); setForm({ ...t, lb: String(t.lb), lt: String(t.lt), km: String(t.km), harga_num: String(t.harga_num) }); setTab('form') }} style={btnSx}>Edit</button></td>
                 </tr>
               ))}
             </tbody>
@@ -185,114 +235,129 @@ export default function AdminPage() {
 
       {tab === 'form' && (
         <div style={cardSx}>
-          <h2 style={{ marginBottom: '1.5rem' }}>{editId ? 'Edit Tipe Rumah' : 'Tambah Tipe Baru'}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <Field label="Pilih Perumahan">
-              <select value={form.perumahan_id} onChange={e => setForm({ ...form, perumahan_id: e.target.value })} style={inputSx}>
-                <option value="">Pilih...</option>
+          <div style={gridSx}>
+            <Field label="Perumahan" required full>
+              <select value={form.perumahan_id} onChange={e => set('perumahan_id', e.target.value)} style={inputSx}>
+                <option value="">Pilih perumahan...</option>
                 {perumahanList.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </Field>
-            <Field label="Nama Tipe Unit"><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={inputSx} /></Field>
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={labelSx}>Deskripsi Detail</label>
-              <RichEditor value={form.deskripsi} onChange={v => setForm({ ...form, deskripsi: v })} />
+
+            <SectionLabel>INFORMASI TIPE</SectionLabel>
+            <Field label="Nama Tipe" required>
+              <input value={form.name} onChange={e => { const v = e.target.value; setForm((f: any) => ({ ...f, name: v, slug: toSlug(v) })) }} style={inputSx} />
+            </Field>
+            <Field label="Slug (URL)" hint="Auto-generate dari nama">
+              <input value={form.slug} onChange={e => set('slug', e.target.value)} style={inputSx} />
+            </Field>
+
+            <Field label="Deskripsi" full>
+              <RichEditor value={form.deskripsi} onChange={v => set('deskripsi', v)} />
+            </Field>
+
+            <Field label="Badge" required>
+              <select value={form.badge} onChange={e => set('badge', e.target.value)} style={inputSx}>
+                {BADGE_OPTIONS.map(b => <option key={b}>{b}</option>)}
+              </select>
+            </Field>
+            <Field label="Highlight di Landing Page">
+              <input type="checkbox" checked={form.highlight} onChange={e => set('highlight', e.target.checked)} />
+            </Field>
+
+            <SectionLabel>SPESIFIKASI</SectionLabel>
+            <Field label="Luas Bangunan (m²)" required><input type="number" value={form.lb} onChange={e => set('lb', e.target.value)} style={inputSx} /></Field>
+            <Field label="Luas Tanah (m²)" required><input type="number" value={form.lt} onChange={e => set('lt', e.target.value)} style={inputSx} /></Field>
+            <Field label="Kamar Tidur" required hint='cth: "3" atau "2+1"'><input value={form.kt} onChange={e => set('kt', e.target.value)} style={inputSx} /></Field>
+            <Field label="Kamar Mandi" required><input type="number" value={form.km} onChange={e => set('km', e.target.value)} style={inputSx} /></Field>
+
+            <SectionLabel>HARGA</SectionLabel>
+            <Field label="Harga (tampilan)" required hint='cth: "Rp 685 Juta"'><input value={form.harga} onChange={e => set('harga', e.target.value)} style={inputSx} /></Field>
+            <Field label="Harga (angka)" required hint="Untuk filter & sorting"><input type="number" value={form.harga_num} onChange={e => set('harga_num', e.target.value)} style={inputSx} /></Field>
+
+           <SectionLabel>Foto Rumah → disimpan ke Galeri</SectionLabel>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div onClick={() => fileRef.current?.click()} style={{ border: '1.5px dashed var(--gray300)', borderRadius: 12, padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: 'var(--gray50)' }}>
+                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', opacity: 0.4 }}>🖼</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--gray700)', marginBottom: '0.25rem' }}>Klik untuk pilih foto</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--gray500)' }}>PNG, JPG, WebP — bisa pilih beberapa foto sekaligus</div>
+              </div>
+              <input ref={fileRef} type="file" multiple accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={(e) => handleFiles(e.target.files)} />
             </div>
+
+            {previews.length > 0 && (
+              <div style={{ gridColumn: '1/-1', display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+                {previews.map((p, i) => (
+                  <div key={i} style={{ position: 'relative' }}>
+                    <img src={p.url} style={{ width: 100, height: 70, objectFit: 'cover', borderRadius: 8 }} alt="" />
+                    <button onClick={() => removePreview(i)} style={{ position: 'absolute', top: -5, right: -5, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer' }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <button onClick={handleTipeSubmit} disabled={loading} style={btnMain}>{loading ? 'Menyimpan...' : 'Simpan Data Tipe'}</button>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: '2rem' }}>
+            <button onClick={resetForm} style={btnSx}>Reset</button>
+            <button onClick={handleSubmit} disabled={loading} style={{ ...btnSx, background: 'var(--p)', fontWeight: 700 }}>{loading ? 'Menyimpan...' : 'Simpan Tipe Rumah'}</button>
+          </div>
         </div>
       )}
 
       {tab === 'perumahan' && (
         <div style={cardSx}>
-          <button onClick={() => { setPerEditId('NEW'); setPerForm({ name: '', lokasi: '', deskripsi: '', kota: '', slug: '' }) }} style={{ ...btnSmall, background: 'var(--p)', marginBottom: '1.5rem' }}>+ Tambah Perumahan Baru</button>
-
+          <button onClick={() => { setPerEditId('NEW'); setPerForm(EMPTY_PER_FORM) }} style={{ ...btnSx, background: 'var(--p)', marginBottom: '1rem' }}>+ Tambah Perumahan</button>
           {perEditId && (
-            <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: 12, marginBottom: '2rem', border: '1.5px solid var(--p)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-
-                {/* Field Nama: Mengisi Nama DAN Slug sekaligus */}
-                <Field label="Nama Perumahan">
-                  <input
-                    value={perForm.name}
-                    onChange={e => {
-                      const val = e.target.value;
-                      setPerForm({
-                        ...perForm,
-                        name: val,
-                        slug: val.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
-                      })
-                    }}
-                    style={inputSx}
-                    placeholder="cth: Grand Sentosa Land"
-                  />
-                </Field>
-
-                {/* Field Slug: Otomatis terisi, tapi tetap bisa diedit manual kalau mau */}
-                <Field label="Slug">
-                  <input
-                    value={perForm.slug}
-                    onChange={e => setPerForm({ ...perForm, slug: e.target.value })}
-                    style={{ ...inputSx, color: 'var(--gray500)' }}
-                    placeholder="grand-sentosa-land"
-                  />
-                </Field>
-
-                <Field label="Lokasi/Alamat">
-                  <input value={perForm.lokasi} onChange={e => setPerForm({ ...perForm, lokasi: e.target.value })} style={inputSx} />
-                </Field>
-
-                <Field label="Kota">
-                  <input value={perForm.kota} onChange={e => setPerForm({ ...perForm, kota: e.target.value })} style={inputSx} />
-                </Field>
-
-                <div style={{ gridColumn: '1/-1' }}>
-                  <RichEditor value={perForm.deskripsi} onChange={v => setPerForm({ ...perForm, deskripsi: v })} />
-                </div>
+            <div style={{ background: 'var(--gray50)', padding: '1.5rem', borderRadius: 12, border: '1.5px solid var(--p)', marginBottom: '1rem' }}>
+              <div style={gridSx}>
+                <Field label="Nama"><input value={perForm.name} onChange={e => { const v = e.target.value; setPerForm((f: any) => ({ ...f, name: v, slug: toSlug(v) })) }} style={inputSx} /></Field>
+                <Field label="Slug"><input value={perForm.slug} onChange={e => setPerForm((f: any) => ({ ...f, slug: e.target.value }))} style={inputSx} /></Field>
+                <Field label="Lokasi"><input value={perForm.lokasi} onChange={e => setPerForm((f: any) => ({ ...f, lokasi: e.target.value }))} style={inputSx} /></Field>
+                <Field label="Kota"><input value={perForm.kota} onChange={e => setPerForm((f: any) => ({ ...f, kota: e.target.value }))} style={inputSx} /></Field>
+                <div style={{ gridColumn: '1/-1' }}><RichEditor value={perForm.deskripsi} onChange={v => setPerForm((f: any) => ({ ...f, deskripsi: v }))} /></div>
               </div>
-
-              <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem' }}>
-                <button onClick={handlePerSubmit} style={{ ...btnSmall, background: 'var(--p)', border: 'none', flex: 1 }}>
-                  Simpan Perumahan
-                </button>
-                <button onClick={() => setPerEditId(null)} style={{ ...btnSmall, flex: 1 }}>
-                  Batal
-                </button>
-              </div>
+              <button onClick={handlePerSubmit} style={{ ...btnSx, background: 'var(--p)', marginTop: '1rem' }}>Simpan Perumahan</button>
             </div>
           )}
-
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr style={{ textAlign: 'left' }}><th style={thSx}>Perumahan</th><th style={thSx}>Aksi</th></tr></thead>
-            <tbody>
-              {perumahanList.map(p => (
-                <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={tdSx}>{p.name} <br /> <br /><small>{p.kota}</small> <small style={{ color: '#888' }}>{p.lokasi}</small></td>
-                  <td style={tdSx}><button onClick={() => openPerEdit(p)} style={btnSmall}>Edit</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {perumahanList.map(p => (
+            <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee' }}>
+              <span>{p.name} - <small>{p.lokasi}</small></span>
+              <button onClick={() => { setPerEditId(p.id); setPerForm(p) }} style={btnSx}>Edit</button>
+            </div>
+          ))}
         </div>
       )}
 
-      {toast && <div style={toastSx}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', bottom: 20, right: 20, background: 'var(--p)', padding: '1rem', borderRadius: 12, fontWeight: 700 }}>{toast}</div>}
     </div>
   )
 }
 
-// --- Style Helpers ---
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}><label style={labelSx}>{label}</label>{children}</div>
+// ── Shared UI Components ──────────────────────────────────────
+function Field({ label, required, hint, full, children }: { label: string; required?: boolean; hint?: string; full?: boolean; children: React.ReactNode }) {
+  return (
+    <div style={{ gridColumn: full ? '1 / -1' : undefined, display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <label style={labelSx}>{label} {required && <span style={{ color: 'red' }}>*</span>}</label>
+      {children}
+      {hint && <span style={{ fontSize: '0.7rem', color: '#888' }}>{hint}</span>}
+    </div>
+  )
 }
 
-const tabBtn = { padding: '1rem', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600 }
-const cardSx = { background: 'white', padding: '2rem', borderRadius: 16, border: '1.5px solid #eee' }
-const inputSx = { padding: '0.75rem', borderRadius: 10, border: '1.5px solid #eee', outline: 'none', fontFamily: 'inherit' }
-const labelSx = { fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: 5 }
-const thSx = { padding: '1rem', color: '#888', fontWeight: 500, fontSize: '0.8rem' }
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ gridColumn: '1 / -1', marginTop: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: 5 }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888' }}>{children}</span>
+    </div>
+  )
+}
+
+const tabBtnSx = { padding: '1rem', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600 }
+const cardSx = { background: 'white', padding: '2rem', borderRadius: 16, border: '1.5px solid var(--gray200)' }
+const inputSx = { padding: '0.75rem', borderRadius: 10, border: '1.5px solid var(--gray200)', outline: 'none' }
+const labelSx = { fontSize: '0.85rem', fontWeight: 600, color: '#444' }
+const thSx = { padding: '1rem', color: '#888', fontWeight: 500 }
 const tdSx = { padding: '1rem' }
-const btnSmall = { padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #eee', cursor: 'pointer', background: 'white', fontWeight: 600 }
-const btnMain = { width: '100%', padding: '1rem', borderRadius: 100, border: 'none', background: '#1de264', fontWeight: 700, cursor: 'pointer', marginTop: '2rem' }
-const btnTool = { padding: '4px 10px', border: '1px solid #ddd', borderRadius: 5, background: 'white', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }
-const toastSx: React.CSSProperties = { position: 'fixed', bottom: 20, right: 20, background: '#1de264', padding: '1rem 2rem', borderRadius: 12, fontWeight: 700, zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+const btnSx = { padding: '0.6rem 1.2rem', borderRadius: 100, border: '1.5px solid var(--gray200)', background: 'white', cursor: 'pointer', fontWeight: 600 }
+const btnToolSx = { padding: '5px 10px', border: '1px solid #ddd', borderRadius: 5, background: 'white', cursor: 'pointer' }
+const gridSx = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }
