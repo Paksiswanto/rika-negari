@@ -51,10 +51,8 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
   const houseColor = houseColors[colorIndex % 3]
   
   const detailHref = `/properti/${perumahan.slug}/${tipe.slug}`
-console.log('isi tipe:', tipe);
   const firstPhoto = tipe.galeri
     ?.sort((a, b) => a.urutan - b.urutan)?.[0]?.url ?? ''
-  console.log('First photo for', tipe.name, ':', tipe.galeri, '=>', firstPhoto)
   return (
     <div className="prop-card">
       {/* Image Section */}
