@@ -6,11 +6,14 @@ import { usePathname } from 'next/navigation'
 import { FaBars, FaTimes } from 'react-icons/fa' // Pastikan react-icons sudah terinstal
 
 const links = [
-  { href: '/',         label: 'Beranda' },
+  { href: '/', label: 'Beranda' },
   { href: '/properti', label: 'Perumahan' },
   { href: '/#tentang', label: 'Tentang Kami' },
-  { href: '/#kontak',  label: 'Kontak' },
+  { href: '/#testimonials', label: 'Testimoni' },
 ]
+const WA_NUMBER = '081217813965'
+const WA_MESSAGE = `Halo Rika Negari, saya mau konsultasi tentang properti di surabaya raya.`
+const href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MESSAGE)}`
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -34,11 +37,11 @@ export default function Navbar() {
       </Link>
 
       {/* Desktop Menu */}
-      <ul className="nav-links" style={{ 
-        display: 'flex', 
-        gap: '2rem', 
-        listStyle: 'none', 
-        alignItems: 'center' 
+      <ul className="nav-links" style={{
+        display: 'flex',
+        gap: '2rem',
+        listStyle: 'none',
+        alignItems: 'center'
       }}>
         {links.map((link) => (
           <li key={link.href}>
@@ -53,7 +56,7 @@ export default function Navbar() {
           </li>
         ))}
         <li>
-          <Link href="/#kontak" className="btn-primary" style={{ padding: '0.55rem 1.4rem', fontSize: '0.82rem' }}>
+          <Link href={href} target="_blank" className="btn-primary" style={{ padding: '0.55rem 1.4rem', fontSize: '0.82rem' }}>
             Konsultasi Gratis
           </Link>
         </li>
@@ -82,9 +85,9 @@ export default function Navbar() {
           animation: 'fadeIn 0.3s ease'
         }}>
           {links.map((link) => (
-            <Link 
-              key={link.href} 
-              href={link.href} 
+            <Link
+              key={link.href}
+              href={link.href}
               onClick={() => setIsOpen(false)} // Tutup menu setelah klik
               style={{
                 fontSize: '1.25rem',
@@ -96,9 +99,9 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link 
-            href="/#kontak" 
-            className="btn-primary" 
+          <Link
+            href="/#kontak"
+            className="btn-primary"
             onClick={() => setIsOpen(false)}
             style={{ marginTop: '1rem' }}
           >

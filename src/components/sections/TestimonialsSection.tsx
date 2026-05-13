@@ -8,7 +8,7 @@ const avatarColors = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="section" style={{ background: 'var(--plight)' }}>
+    <section className="section" id="testimonials" style={{ background: 'var(--plight)' }}>
       <span className="sec-label">Apa Kata Mereka</span>
       <h2 style={{ 
         fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', 

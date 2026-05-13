@@ -28,28 +28,39 @@ export interface Perumahan {
   unit_tersisa: number
   tipes?: Tipe[]
 }
-export async function getTipes(): Promise<any[]> {
+export async function getTipes(options?: { page?: number; limit?: number; search?: string; perumahanId?: string; luas?: string }): Promise<{ data: any[], count: number }> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const page = options?.page || 1
+  const limit = options?.limit || 6
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  let query = supabase
     .from('tipe_rumah')
     .select(`
       *,
-      perumahan:perumahan_id (
-        id,
-        name,
-        slug,
-        lokasi
-      ),
+      perumahan:perumahan_id (id, name, slug, lokasi),
       galeri (url, label, urutan)
-    `)
+    `, { count: 'exact' }) // Menghitung total data di database
+
+  // Server-side Filtering
+  if (options?.search) query = query.ilike('name', `%${options.search}%`)
+  if (options?.perumahanId) query = query.eq('perumahan_id', options.perumahanId)
+
+  if (options?.luas === 'small') query = query.lt('lb', 60)
+  if (options?.luas === 'medium') query = query.gte('lb', 60).lte('lb', 80)
+  if (options?.luas === 'large') query = query.gt('lb', 80)
+
+  const { data, error, count } = await query
     .order('created_at', { ascending: false })
+    .range(from, to)
 
   if (error) {
     console.error('getTipes error:', error)
-    return []
+    return { data: [], count: 0 }
   }
-  return data ?? []
+  return { data: data ?? [], count: count ?? 0 }
 }
 // ── Fetch ──────────────────────────────────────────────────
 
@@ -60,7 +71,7 @@ export async function getTipes(): Promise<any[]> {
  * @param options.limitTipe - Jumlah maksimal tipe rumah per perumahan (default: null/semua)
  * @param options.lokasi - Filter berdasarkan lokasi perumahan
  */
-export async function getProperties(options?: { limitPerumahan?: number; limitTipe?: number ; lokasi?: string }): Promise<Perumahan[]> {
+export async function getProperties(options?: { limitPerumahan?: number; limitTipe?: number; lokasi?: string }): Promise<Perumahan[]> {
   const supabase = createClient()
 
   let query = supabase
@@ -97,8 +108,8 @@ export async function getProperties(options?: { limitPerumahan?: number; limitTi
   if (options?.limitTipe) {
     finalData = finalData.map((p: any) => ({
       ...p,
-      tipes: p.tipes 
-        ? p.tipes.sort(() => Math.random() - 0.5).slice(0, options.limitTipe) 
+      tipes: p.tipes
+        ? p.tipes.sort(() => Math.random() - 0.5).slice(0, options.limitTipe)
         : []
     }))
   }
