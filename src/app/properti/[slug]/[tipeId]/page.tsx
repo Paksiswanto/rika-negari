@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer'
 import WAButton from '@/components/ui/WAButton'
 import ImageSlider from '@/components/ui/ImageSlider'
 import ContactForm from '@/components/ui/ContactForm'
+import Link from 'next/link'
 
 interface Props {
   params: { slug: string; tipeId: string }
@@ -48,9 +49,9 @@ export default async function DetailPage({ params }: Props) {
           <span style={{ color: 'var(--p3)', fontWeight: 600 }}>{tipe.name}</span>
         </div>
 
-        {/* Container Utama - Diubah jadi Single Column */}
+
         <div style={{
-          maxWidth: '900px', // Dibuat lebih ramping agar enak dibaca satu kolom
+          maxWidth: '900px',
           margin: '0 auto',
           padding: '2rem 1.5rem',
           display: 'flex',
@@ -58,24 +59,44 @@ export default async function DetailPage({ params }: Props) {
           gap: '2.5rem'
         }}>
 
-          {/* 1. Header Info (Nama & Harga) */}
+          <Link
+            href="/properti"
+            className="btn-back" // Tambahkan class ini
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.85rem',
+              color: 'var(--gray700)',
+              textDecoration: 'none',
+              fontWeight: 600,
+              padding: '0.5rem 1rem',
+              borderRadius: '100px',
+              backgroundColor: 'var(--gray50)',
+              transition: 'all 0.2s',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Kembali ke Katalog
+          </Link>
           <div style={{ textAlign: 'left' }}>
             <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', fontFamily: 'Fraunces, serif' }}>{tipe.name}</h1>
             <p style={{ fontSize: '1rem', color: 'var(--gray500)', marginBottom: '1.5rem' }}>📍 {perumahan.lokasi}</p>
-            
+
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', fontWeight: 600, color: 'var(--p2)' }}>{tipe.harga}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--gray500)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Harga Mulai</div>
             </div>
           </div>
 
-          {/* 2. Galeri */}
+
           <ImageSlider slides={galeri} />
 
-          {/* 3. Spesifikasi Ringkas */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
             gap: '1rem',
             padding: '1.5rem',
             background: 'var(--gray50)',
@@ -90,14 +111,13 @@ export default async function DetailPage({ params }: Props) {
             ))}
           </div>
 
-          {/* 4. Deskripsi Detail */}
           <div style={{ lineHeight: 1.8 }}>
             <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Tentang {perumahan.name}</h2>
             <p style={{ fontSize: '1rem', color: 'var(--gray600)', marginBottom: '2rem' }}>{perumahan.deskripsi}</p>
-            
+
             <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Detail Tipe {tipe.name}</h2>
             {tipe.deskripsi && (
-              <div 
+              <div
                 className="rich-content"
                 dangerouslySetInnerHTML={{ __html: tipe.deskripsi }}
                 style={{ fontSize: '1rem', color: 'var(--gray600)' }}
@@ -105,7 +125,6 @@ export default async function DetailPage({ params }: Props) {
             )}
           </div>
 
-          {/* 5. Bagian Kontak (Pengganti Sticky Card) */}
           <div style={{
             padding: '2.5rem',
             borderRadius: 24,

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Rika Negari Property — Partner Hunian Terpercaya Jawa Timur',
     description: 'Temukan unit perumahan terbaik dengan harga transparan dan bantuan KPR hingga tuntas.',
-    url: 'https://rika-negari-kappa.vercel.app/', 
+    url: 'https://rika-negari.com', 
     siteName: 'Rika Negari Property',
     locale: 'id_ID',
     type: 'website',
