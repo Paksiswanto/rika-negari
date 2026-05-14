@@ -1,3 +1,7 @@
+export const revalidate = 10800
+export const dynamic = 'force-dynamic'
+
+
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import WAButton from '@/components/ui/WAButton'
