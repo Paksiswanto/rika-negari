@@ -5,9 +5,7 @@ import HeroSection from '@/components/sections/HeroSection'
 import AnnouncementStrip from '@/components/sections/AnnouncementStrip'
 import FeaturedProperties from '@/components/sections/FeaturedProperties'
 import AboutSection from '@/components/sections/AboutSection'
-import GallerySection from '@/components/sections/GallerySection'
 import TestimonialsSection from '@/components/sections/TestimonialsSection'
-import ContactForm from '@/components/ui/ContactForm'
 
 export default function HomePage() {
   return (

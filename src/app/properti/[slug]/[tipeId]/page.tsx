@@ -40,7 +40,6 @@ export default async function DetailPage({ params }: Props) {
     <>
       <Navbar />
       <main style={{ backgroundColor: 'white' }}>
-        {/* Breadcrumb */}
         <div style={{ padding: '1rem 1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--gray500)', borderBottom: '1px solid var(--gray200)', flexWrap: 'wrap' }}>
           <a href="/" style={{ color: 'var(--gray500)', textDecoration: 'none' }}>Beranda</a>
           <span>›</span>
@@ -85,9 +84,9 @@ export default async function DetailPage({ params }: Props) {
             <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', fontFamily: 'Fraunces, serif' }}>{tipe.name}</h1>
             <p style={{ fontSize: '1rem', color: 'var(--gray500)', marginBottom: '1.5rem' }}>📍 {perumahan.lokasi}</p>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
+            <div style={{ display: '', alignItems: 'baseline', gap: '1rem' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--gray500)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Harga Mulai : </div>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', fontWeight: 600, color: 'var(--p2)' }}>{tipe.harga}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--gray500)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Harga Mulai</div>
             </div>
           </div>
 

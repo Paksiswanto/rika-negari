@@ -6,7 +6,6 @@ import Link from 'next/link'
 import type { Perumahan, Tipe } from '@/data/properties'
 import Loading from '@/components/ui/loading'
 
-// ── Types ────────────────────────────────────────────────────
 interface Props {
   tipe        : Tipe
   perumahan   : Perumahan
@@ -41,7 +40,6 @@ function HouseIcon({ color }: { color: string }) {
   )
 }
 
-// ── Skeleton Component ───────────────────────────────────────
 export function PropertyCardSkeleton() {
   return (
     <div className="skeleton-card">
@@ -77,11 +75,10 @@ export function PropertyCardSkeleton() {
   )
 }
 
-// ── Main Component ───────────────────────────────────────────
 export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props) {
   const [saved, setSaved] = useState(false)
   const [saveHover, setSaveHover] = useState(false)
-  const [isRedirecting, setIsRedirecting] = useState(false) // State dipindah ke dalam fungsi
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   if (!perumahan) return null;
 
@@ -91,18 +88,14 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
   
   const firstPhoto = tipe.galeri?.sort((a, b) => a.urutan - b.urutan)?.[0]?.url ?? ''
 
-  // Handler dipindah ke dalam fungsi
   const handleDetailClick = () => {
     setIsRedirecting(true)
-    // Optional: timeout hanya untuk simulasi kalau navigasi terlalu cepat
     setTimeout(() => {
-      // Kita biarkan true sampai halaman benar-benar pindah
     }, 2000)
   }
 
   return (
     <div className="prop-card">
-      {/* Image Section */}
       <div
         className={ci}
         style={{ height: 290, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -127,7 +120,6 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
         </span>
       </div>
 
-      {/* Body Section */}
       <div style={{ padding: '1.25rem' }}>
         <div style={{ fontFamily: 'Fraunces, serif', fontSize: '1.1rem', fontWeight: 600, color: 'var(--gray900)', marginBottom: '0.2rem' }}>
           {tipe.name}
@@ -137,7 +129,6 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
           {perumahan.name}
         </div>
 
-        {/* Specs */}
         <div className="spec-row" style={{ marginBottom: '1rem' }}>
           {[
             { val: `${tipe.lb} m²`, key: 'LB' },
@@ -156,7 +147,6 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
           {tipe.harga}
         </div>
 
-        {/* Actions */}
         <div style={{ display: 'flex', gap: '0.6rem' }}>
           <Link
             href={detailHref}
@@ -176,24 +166,6 @@ export default function PropertyCard({ tipe, perumahan, colorIndex = 0 }: Props)
               'Lihat Detail'
             )}
           </Link>
-
-          <button
-            onClick={(e) => { e.preventDefault(); setSaved(!saved) }}
-            onMouseEnter={() => setSaveHover(true)}
-            onMouseLeave={() => setSaveHover(false)}
-            style={{
-              background : saved || saveHover ? 'var(--plight)' : 'var(--gray100)',
-              color      : saved || saveHover ? 'var(--p3)'    : 'var(--gray500)',
-              padding    : '0.65rem 0.85rem',
-              fontSize   : '0.85rem',
-              border     : 'none',
-              borderRadius: 100,
-              cursor     : 'pointer',
-              transition : 'all 0.2s',
-            }}
-          >
-            {saved ? '♥' : '♡'}
-          </button>
         </div>
       </div>
     </div>

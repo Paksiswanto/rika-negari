@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link'
-import { FiInstagram, FiPhoneCall, FiFacebook, FiMail } from "react-icons/fi";
+import { FaInstagramSquare , FaWhatsappSquare , FaFacebook , FaTiktok , } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -33,10 +33,10 @@ export default function Footer() {
           </p>
           <div style={{ display: 'flex', gap: '0.6rem' }}>
             {[
-              { href: 'https://www.instagram.com/rikanegari/', icon: <FiInstagram size={18} /> },
-              { href: 'https://www.facebook.com/rikanegari', icon: <FiFacebook size={18} /> },
-              { href: 'mailto:info@rikanegari.co.id/', icon: <FiMail size={18} /> },
-              { href: 'https://wa.me/6281217813965', icon: <FiPhoneCall size={18} /> },
+              { href: 'https://www.instagram.com/rikanegari/', icon: <FaInstagramSquare size={18} /> },
+              { href: 'https://www.facebook.com/share/1aTjifyBow/', icon: <FaFacebook size={18} /> },
+              { href: 'https://www.tiktok.com/@rikanegari', icon: <FaTiktok size={18} /> },
+              { href: 'https://wa.me/6281217813965', icon: <FaWhatsappSquare size={18} /> },
             ].map((s) => (
               <Link key={s.href} href={s.href} target="_blank" rel="noopener noreferrer">
                 <div

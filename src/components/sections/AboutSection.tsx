@@ -30,8 +30,8 @@ export default function AboutSection() {
             boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
           }}>
             <Image
-              src="/images/rika-negari.jpeg" // Ganti dengan nama file aslimu
-              alt="Interior Rumah Premium"
+              src="/images/rika-property.jpeg" // Ganti dengan nama file aslimu
+              alt="Rika Property"
               fill
               style={{ objectFit: 'cover' }}
             />
@@ -48,29 +48,11 @@ export default function AboutSection() {
             zIndex: 2,
           }}>
             <Image
-              src="/images/rika-property.jpeg" // Path yang benar
-              alt="Interior Rumah Premium"
+              src="/images/id-card.jpeg" // Path yang benar
+              alt="id card"
               fill
               style={{ objectFit: 'cover' }}
             />
-          </div>
-
-          {/* Years badge - Tetap dipertahankan karena ini elemen branding penting */}
-          <div style={{
-            position: 'absolute', top: '40%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'var(--white)',
-            borderRadius: '20px',
-            padding: '1.2rem 1.8rem',
-            textAlign: 'center',
-            zIndex: 10,
-            border: '2px solid #b6f5d4',
-            boxShadow: '0 10px 30px rgba(29,226,100,0.25)',
-          }}>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', fontWeight: 600, color: 'var(--p2)', lineHeight: 1 }}>15</div>
-            <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--gray500)', marginTop: '0.3rem', whiteSpace: 'nowrap' }}>
-              Tahun Pengalaman
-            </div>
           </div>
         </div>
 

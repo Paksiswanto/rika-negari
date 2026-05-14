@@ -97,7 +97,6 @@ export default function PropertiPage() {
 
       <main className="section" style={{ background: 'var(--gray50)', minHeight: '88vh' }}>
 
-        {/* Header Title */}
         <div style={{ marginBottom: '2.5rem' }}>
           <span className="sec-label">Katalog Lengkap</span>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', marginTop: '0.5rem', fontWeight: 800 }}>
@@ -105,7 +104,6 @@ export default function PropertiPage() {
           </h1>
         </div>
 
-        {/* Filter Bar Section */}
         <div style={filterBarSx}>
           <input
             style={inputStyle}
@@ -134,13 +132,10 @@ export default function PropertiPage() {
           </div>
         </div>
 
-        {/* Grid Katalog */}
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
           {loading ? (
-            /* Tampilan Skeleton Shimmer saat loading */
             <>{[...Array(6)].map((_, i) => <PropertyCardSkeleton key={i} />)}</>
           ) : allTipes.length === 0 ? (
-            /* Tampilan jika data kosong */
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '6rem 2rem', background: 'white', borderRadius: 24 }}>
               <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🔍</div>
               <p style={{ color: 'var(--gray500)', fontWeight: 500 }}>Properti yang kamu cari tidak ditemukan.</p>
@@ -152,7 +147,6 @@ export default function PropertiPage() {
               </button>
             </div>
           ) : (
-            /* Render Kartu Properti */
             allTipes.map((item, i) => (
               <PropertyCard
                 key={item.id}
@@ -164,10 +158,8 @@ export default function PropertiPage() {
           )}
         </div>
 
-        {/* Pagination Nav */}
         {!loading && totalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginTop: '4.5rem' }}>
-            {/* Tombol Previous */}
             <button
               disabled={currentPage === 1}
               onClick={() => { setCurrentPage(p => p - 1); window.scrollTo(0, 0) }}
@@ -175,8 +167,6 @@ export default function PropertiPage() {
             >
               ‹
             </button>
-
-            {/* Angka & Ellipsis */}
             {getPaginationGroup(currentPage, totalPages).map((item, i) => (
               <button
                 key={i}
@@ -195,7 +185,6 @@ export default function PropertiPage() {
               </button>
             ))}
 
-            {/* Tombol Next */}
             <button
               disabled={currentPage === totalPages}
               onClick={() => { setCurrentPage(p => p + 1); window.scrollTo(0, 0) }}
@@ -213,7 +202,6 @@ export default function PropertiPage() {
   )
 }
 
-// ─── Inline Styles ───
 const filterBarSx: React.CSSProperties = {
   background: 'white',
   border: '1.5px solid var(--gray200)',
