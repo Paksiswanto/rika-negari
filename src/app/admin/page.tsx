@@ -11,7 +11,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 const supabase = createClient()
 
 const BADGE_OPTIONS = ['Ready Stock', 'Inden', 'Best Seller', 'Premium']
-const CLOUD_NAME    = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
 const ITEMS_PER_PAGE = 10
 
@@ -70,20 +70,20 @@ function RichEditor({ value, onChange, placeholder }: { value: string; onChange:
   return (
     <div style={{ border: '1.5px solid var(--gray200)', borderRadius: 10, overflow: 'hidden' }}>
       <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', padding: '6px 8px', borderBottom: '1px solid var(--gray200)', background: 'var(--gray50)' }}>
-        <TB active={editor.isActive('bold')}      onClick={() => editor.chain().focus().toggleBold().run()}      title="Bold"><b>B</b></TB>
-        <TB active={editor.isActive('italic')}    onClick={() => editor.chain().focus().toggleItalic().run()}    title="Italic"><em>I</em></TB>
+        <TB active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold"><b>B</b></TB>
+        <TB active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic"><em>I</em></TB>
         <TB active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></TB>
-        <TB active={editor.isActive('strike')}    onClick={() => editor.chain().focus().toggleStrike().run()}    title="Strike"><s>S</s></TB>
+        <TB active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()} title="Strike"><s>S</s></TB>
         <div style={{ width: 1, background: 'var(--gray200)', margin: '0 3px' }} />
         <TB active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="H2">H2</TB>
         <TB active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title="H3">H3</TB>
         <div style={{ width: 1, background: 'var(--gray200)', margin: '0 3px' }} />
-        <TB active={editor.isActive('bulletList')}  onClick={() => editor.chain().focus().toggleBulletList().run()}  title="Bullet">• List</TB>
+        <TB active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Bullet">• List</TB>
         <TB active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Ordered">1. List</TB>
         <div style={{ width: 1, background: 'var(--gray200)', margin: '0 3px' }} />
-        <TB active={editor.isActive({ textAlign: 'left' })}   onClick={() => editor.chain().focus().setTextAlign('left').run()}   title="Left">≡L</TB>
+        <TB active={editor.isActive({ textAlign: 'left' })} onClick={() => editor.chain().focus().setTextAlign('left').run()} title="Left">≡L</TB>
         <TB active={editor.isActive({ textAlign: 'center' })} onClick={() => editor.chain().focus().setTextAlign('center').run()} title="Center">≡C</TB>
-        <TB active={editor.isActive({ textAlign: 'right' })}  onClick={() => editor.chain().focus().setTextAlign('right').run()}  title="Right">≡R</TB>
+        <TB active={editor.isActive({ textAlign: 'right' })} onClick={() => editor.chain().focus().setTextAlign('right').run()} title="Right">≡R</TB>
         <div style={{ width: 1, background: 'var(--gray200)', margin: '0 3px' }} />
         <TB active={false} onClick={() => editor.chain().focus().undo().run()} title="Undo">↩</TB>
         <TB active={false} onClick={() => editor.chain().focus().redo().run()} title="Redo">↪</TB>
@@ -246,7 +246,7 @@ export default function AdminPage() {
       </div>
 
       <div style={{ background: 'var(--white)', border: '1.5px solid var(--gray200)', borderTop: 'none', borderRadius: '0 0 16px 16px' }}>
-        
+
         {/* ── TAB LIST ── */}
         {tab === 'list' && (
           <div>
@@ -398,39 +398,74 @@ export default function AdminPage() {
 
         {/* ── TAB PERUMAHAN ── */}
         {tab === 'perumahan' && (
-          <div>
+          <div style={{ background: 'var(--white)', border: '1.5px solid var(--gray200)', borderTop: 'none', borderRadius: '0 0 16px 16px' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem', borderBottom: '1.5px solid var(--gray200)' }}>
-              <button onClick={() => { setPerEditId('NEW'); setPerForm(EMPTY_PER) }} style={{ ...btnSx, background: 'var(--p)' }}>+ Tambah Perumahan</button>
+              <button
+                onClick={() => { setPerEditId(perEditId === 'NEW' ? null : 'NEW'); setPerForm(EMPTY_PER) }}
+                style={{ ...btnSx, background: perEditId === 'NEW' ? 'var(--gray100)' : 'var(--p)', color: perEditId === 'NEW' ? 'var(--gray700)' : 'var(--gray900)', borderColor: perEditId === 'NEW' ? 'var(--gray200)' : 'var(--p2)', fontWeight: 700 }}
+              >
+                {perEditId === 'NEW' ? 'Tutup Form' : '+ Tambah Perumahan'}
+              </button>
             </div>
-            {perEditId && (
-              <div style={{ padding: '1.5rem', background: 'var(--gray50)', borderBottom: '1px solid var(--gray200)' }}>
-                <div style={gridSx}>
-                  <Field label="Nama Perumahan" required><input value={perForm.name} onChange={e => { const v = e.target.value; setPerForm((f: any) => ({ ...f, name: v, slug: toSlug(v) })) }} style={inputSx} /></Field>
-                  <Field label="Slug"><input value={perForm.slug} onChange={e => setPerForm((f: any) => ({ ...f, slug: e.target.value }))} style={inputSx} /></Field>
-                  <Field label="Lokasi" required full><input value={perForm.lokasi} onChange={e => setPerForm((f: any) => ({ ...f, lokasi: e.target.value }))} style={inputSx} /></Field>
-                  <div style={{ gridColumn: '1/-1' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 600, display: 'block', marginBottom: 5 }}>Deskripsi</label>
-                    <RichEditor value={perForm.deskripsi} onChange={v => setPerForm((f: any) => ({ ...f, deskripsi: v }))} />
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button onClick={() => setPerEditId(null)} style={btnSx}>Batal</button>
-                  <button onClick={handlePerSubmit} disabled={perLoading} style={{ ...btnSx, background: 'var(--p)' }}>Simpan</button>
-                </div>
+
+            {/* Form tambah baru */}
+            {perEditId === 'NEW' && (
+              <div style={{ padding: '1rem', background: 'var(--gray50)', borderBottom: '1.5px solid var(--gray200)' }}>
+                <InlinePerForm
+                  perForm={perForm} setPerForm={setPerForm}
+                  onSave={handlePerSubmit} onCancel={() => { setPerEditId(null); setPerForm(EMPTY_PER) }}
+                  loading={perLoading}
+                />
               </div>
             )}
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-              <thead><tr style={{ background: 'var(--gray50)' }}>{['Nama', 'Lokasi', ''].map(h => <th key={h} style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid var(--gray200)' }}>{h}</th>)}</tr></thead>
-              <tbody>
-                {perumahanList.map(p => (
-                  <tr key={p.id} style={{ borderBottom: '1px solid var(--gray200)' }}>
-                    <td style={{ padding: '1rem', fontWeight: 600 }}>{p.name}</td>
-                    <td style={{ padding: '1rem' }}>{p.lokasi}</td>
-                    <td style={{ padding: '1rem', textAlign: 'right' }}><button onClick={() => { setPerEditId(p.id); setPerForm(p) }} style={btnSx}>Edit</button></td>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', minWidth: 400 }}>
+                <thead>
+                  <tr style={{ background: 'var(--gray50)' }}>
+                    {['Nama', 'Lokasi', 'Kota', ''].map(h => (
+                      <th key={h} style={{ padding: '0.65rem 1rem', textAlign: 'left', fontWeight: 600, color: 'var(--gray500)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em', borderBottom: '1.5px solid var(--gray200)', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {perumahanList.map(p => (
+                    <>
+                      {/* Row data */}
+                      <tr key={p.id} style={{ borderBottom: perEditId === p.id ? 'none' : '1px solid var(--gray200)', background: perEditId === p.id ? 'var(--plight)' : 'transparent' }}>
+                        <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--gray900)' }}>{p.name}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: 'var(--gray500)', fontSize: '0.8rem' }}>{p.lokasi}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: 'var(--gray500)', fontSize: '0.8rem' }}>{p.kota}</td>
+                        <td style={{ padding: '0.75rem 1rem' }}>
+                          <button
+                            onClick={() => {
+                              if (perEditId === p.id) { setPerEditId(null); setPerForm(EMPTY_PER) }
+                              else { setPerEditId(p.id); setPerForm(p) }
+                            }}
+                            style={{ ...btnSx, color: perEditId === p.id ? 'var(--p3)' : 'var(--gray700)', borderColor: perEditId === p.id ? 'var(--p)' : 'var(--gray200)', background: perEditId === p.id ? 'var(--plight)' : 'var(--white)' }}
+                          >
+                            {perEditId === p.id ? 'Tutup ↑' : 'Edit'}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Inline form row */}
+                      {perEditId === p.id && (
+                        <tr key={`edit-${p.id}`}>
+                          <td colSpan={4} style={{ padding: '0 1rem 1rem', background: 'var(--gray50)', borderBottom: '1.5px solid var(--gray200)' }}>
+                            <InlinePerForm
+                              perForm={perForm} setPerForm={setPerForm}
+                              onSave={handlePerSubmit} onCancel={() => { setPerEditId(null); setPerForm(EMPTY_PER) }}
+                              loading={perLoading}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
@@ -480,6 +515,65 @@ function BadgePill({ badge }: { badge: string }) {
   }
   const s = map[badge] ?? { bg: 'var(--gray100)', color: 'var(--gray700)' }
   return <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 100, fontSize: '0.72rem', fontWeight: 700, background: s.bg, color: s.color }}>{badge}</span>
+}
+function InlinePerForm({ perForm, setPerForm, onSave, onCancel, loading }: {
+  perForm    : any
+  setPerForm : (fn: (f: any) => any) => void
+  onSave     : () => void
+  onCancel   : () => void
+  loading    : boolean
+}) {
+  return (
+    <div style={{ background: 'var(--white)', borderRadius: 12, border: '1.5px solid var(--gray200)', padding: '1.25rem', marginTop: '0.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+        <Field label="Nama Perumahan" required>
+          <input
+            value={perForm.name}
+            onChange={e => { const v = e.target.value; setPerForm(f => ({ ...f, name: v, slug: toSlug(v) })) }}
+            placeholder="cth. Grand Mutiara Residence"
+            style={inputSx}
+          />
+        </Field>
+        <Field label="Slug" hint="Auto dari nama">
+          <input
+            value={perForm.slug}
+            onChange={e => setPerForm(f => ({ ...f, slug: e.target.value }))}
+            style={{ ...inputSx, color: 'var(--gray500)' }}
+          />
+        </Field>
+        <Field label="Lokasi" required full>
+          <input
+            value={perForm.lokasi}
+            onChange={e => setPerForm(f => ({ ...f, lokasi: e.target.value }))}
+            placeholder="cth. Jl. Ahmad Yani No. 88, Sidoarjo"
+            style={inputSx}
+          />
+        </Field>
+        <Field label="Kota">
+          <input
+            value={perForm.kota ?? ''}
+            onChange={e => setPerForm(f => ({ ...f, kota: e.target.value }))}
+            placeholder="cth. Sidoarjo"
+            style={inputSx}
+          />
+        </Field>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--gray700)', display: 'block', marginBottom: 5 }}>Deskripsi</label>
+          <RichEditor
+            value={perForm.deskripsi ?? ''}
+            onChange={v => setPerForm(f => ({ ...f, deskripsi: v }))}
+            placeholder="Tulis deskripsi perumahan..."
+          />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+        <button onClick={onCancel} style={btnSx}>Batal</button>
+        <button onClick={onSave} disabled={loading} style={{ ...btnSx, background: loading ? 'var(--gray200)' : 'var(--p)', color: 'var(--gray900)', borderColor: 'var(--p2)', fontWeight: 700 }}>
+          {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 const gridSx: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }
