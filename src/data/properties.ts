@@ -42,9 +42,8 @@ export async function getTipes(options?: { page?: number; limit?: number; search
       *,
       perumahan:perumahan_id (id, name, slug, lokasi),
       galeri (url, label, urutan)
-    `, { count: 'exact' }) // Menghitung total data di database
+    `, { count: 'exact' }) 
 
-  // Server-side Filtering
   if (options?.search) query = query.ilike('name', `%${options.search}%`)
   if (options?.perumahanId) query = query.eq('perumahan_id', options.perumahanId)
 
@@ -85,12 +84,10 @@ export async function getProperties(options?: { limitPerumahan?: number; limitTi
     `)
     .order('name')
 
-  // Filter berdasarkan lokasi jika ada parameter lokasi
   if (options?.lokasi) {
     query = query.eq('kota', options.lokasi)
   }
 
-  // Batasi jumlah perumahan jika ada parameter limitPerumahan
   if (options?.limitPerumahan) {
     query = query.limit(options.limitPerumahan)
   }
@@ -104,7 +101,6 @@ export async function getProperties(options?: { limitPerumahan?: number; limitTi
 
   let finalData = data ?? []
 
-  // Jika ada parameter limitTipe, acak dan potong jumlah tipenya
   if (options?.limitTipe) {
     finalData = finalData.map((p: any) => ({
       ...p,
@@ -121,26 +117,26 @@ export async function getProperties(options?: { limitPerumahan?: number; limitTi
 export const testimonials = [
   {
     id: 1,
-    text: "Saya sangat puas dengan layanan Prima Properti. Proses pembelian rumah berjalan lancar dan timnya sangat responsif.",
+    text: "Saya sangat puas dengan layanan Rika Properti. Proses pembelian rumah berjalan lancar dan timnya sangat responsif.",
     rating: 5,
-    name: "AR",
+    name: "Andi Rahmat",
     initials: "AR",
-    unit: "Jakarta Selatan",
+    unit: "Surabaya",
   },
   {
     id: 2,
-    text: "Properti yang saya beli dari Prima Properti sesuai dengan deskripsi dan kualitasnya sangat baik. Sangat direkomendasikan!",
+    text: "Properti yang saya beli dari Rika Properti sesuai dengan deskripsi dan kualitasnya sangat baik. Sangat direkomendasikan!",
     rating: 4,
-    name: "MS",
+    name: "Maya Sari",
     initials: "MS",
-    unit: "Bandung",
+    unit: "Malang",
   },
   {
     id: 3,
-    text: "Tim Prima Properti membantu saya menemukan rumah impian saya dengan harga yang kompetitif. Pelayanan yang ramah dan profesional.",
+    text: "Tim Rika Properti membantu saya menemukan rumah impian saya dengan harga yang kompetitif. Pelayanan yang ramah dan profesional.",
     rating: 5,
-    name: "LN",
+    name: "Lina Novita",
     initials: "LN",
-    unit: "Surabaya",
+    unit: "Sidoarjo",
   },
 ];
