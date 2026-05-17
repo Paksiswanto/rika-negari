@@ -60,7 +60,7 @@ export default async function DetailPage({ params }: Props) {
 
           <Link
             href="/properti"
-            className="btn-back" // Tambahkan class ini
+            className="btn-back"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -112,7 +112,11 @@ export default async function DetailPage({ params }: Props) {
 
           <div style={{ lineHeight: 1.8 }}>
             <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Tentang {perumahan.name}</h2>
-            <p style={{ fontSize: '1rem', color: 'var(--gray600)', marginBottom: '2rem' }}>{perumahan.deskripsi}</p>
+             <div
+                className="rich-content"
+                dangerouslySetInnerHTML={{ __html: perumahan.deskripsi }}
+                style={{ fontSize: '1rem', color: 'var(--gray600)' }}
+              />
 
             <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.8rem', fontWeight: 600, marginBottom: '1rem' }}>Detail Tipe {tipe.name}</h2>
             {tipe.deskripsi && (
